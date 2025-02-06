@@ -1,45 +1,51 @@
 spring:
   application:
-    name:mimigate
+   name: mimigate
 
   cloud:
     gateway:
+
       routes:
-#        - id: Rental
-#          uri : http://127.0.0.1:5678
-#          # ??? ????
-#          predicates:
-#            - Path=/first_service/**
-##          filters:
-##            - AddRequestHeader=mydata, bts
-##            - AddResponseHeader=responseHeander, test
-#
-#        - id: Mypage
-#          uri : http://127.0.0.1:5679
-#          # ??? ????
-#          predicates:
-#            # path? /first? ??? ??? ??? ??? uri? ????.
-#            - Path=/secondservice/**
-##          filters:
-##            - AddRequestHeader=secondreq, bts2
-##            - AddResponseHeader=secondres, test2
-        - id: equipment
-          uri : http://127.0.0.1:5680
-          # ??? ????
+        - id: mimi-rental
+          uri: lb://mimi-rental
           predicates:
-            # path? /first? ??? ??? ??? ??? uri? ????.
+            - Path=/rental/**
+
+        - id: mimi-users
+          uri: lb://mimi-users
+          predicates:
+            - Path=/user/**
+
+        - id: mimi-equipment
+          uri: lb://mimi-equipment
+          predicates:
             - Path=/equipment/**
-##          filters:
-##            - AddRequestHeader=secondreq, bts2
-##            - AddResponseHeader=secondres, test2
+      default-filters:
+       - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: 'http://127.0.0.1:5675'
+            allow-credentials: true
+            allowedHeaders: '*'
+            allowedMethods:
+              - PUT
+              - GET
+              - POST
+              - DELETE
+              - OPTIONS
+            exposed-headers: "Authorization, userId"
 
 server:
   port: 5676
 
 eureka:
   client:
-    fetch-registry: false
-    register-with-eureka: false
+    fetch-registry: true
+    register-with-eureka: true
     service-url:
-      defaultZone: http://127.0.0.1:5677/eureka
+      defaultZone: http://127.0.0.1:8761/eureka
+#  instance:
+#    lease-renewal-interval-in-seconds: 2
 
